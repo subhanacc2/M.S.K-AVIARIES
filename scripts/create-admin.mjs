@@ -6,7 +6,11 @@ if (!secret) {
 }
 
 const email = 'admin@mskaviaries.com';
-const password = process.env.ADMIN_PASSWORD || 'Hakunamatata034.';
+const password = process.env.ADMIN_PASSWORD;
+if (!password) {
+  console.error('Set ADMIN_PASSWORD');
+  process.exit(1);
+}
 
 const res = await fetch(`${url}/auth/v1/admin/users`, {
   method: 'POST',
