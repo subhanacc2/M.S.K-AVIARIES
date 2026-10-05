@@ -1,0 +1,17 @@
+{
+  "name": "parrot_website",
+  "version": "1.0.0",
+  "description": "A free, public-facing record of your birds, pairings and lineage, with a private admin panel for prices and buyer/seller contacts.",
+  "main": "index.js",
+  "scripts": {
+    "db:apply": "node scripts/apply-schema.mjs",
+    "db:admin": "node scripts/create-admin.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "pg": "^8.23.1"
+  }
+}
