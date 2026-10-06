@@ -43,8 +43,10 @@ input[type=checkbox]{width:20px;height:20px}.bar input{flex:1;min-width:200px}.b
 .ci{padding:16px 18px 18px;display:grid;gap:4px}.ci small,.mu{color:var(--mu)}.ci em{color:var(--ac);font-style:normal;font-size:14px;font-weight:500}
 .ci .cta{margin-top:8px;font-size:13px;font-weight:600;color:var(--ac2);letter-spacing:.02em}
 .two{display:grid;grid-template-columns:1.1fr 1fr;gap:28px;align-items:start}@media(max-width:820px){.two{grid-template-columns:1fr}}
-.main{border-radius:var(--r);overflow:hidden;aspect-ratio:4/3;display:grid;place-items:center;background:linear-gradient(145deg,#1a2820,#0f1612);border:1px solid var(--line)}.main img{width:100%;height:100%;object-fit:cover}.big{font-size:90px}
-.thumbs{display:flex;gap:10px;margin:12px 0;overflow-x:auto}.thumbs img{width:78px;height:78px;object-fit:cover;border-radius:12px;cursor:pointer;border:1px solid var(--line)}
+.main{border-radius:var(--r);overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#1a2820,#0f1612);border:1px solid var(--line);width:100%;min-height:180px;padding:10px}
+.main img{display:block;max-width:100%;width:auto;height:auto;max-height:min(72vh,820px);object-fit:contain;object-position:center}.big{font-size:90px}
+.thumbs{display:flex;gap:10px;margin:12px 0;overflow-x:auto}.thumbs img{width:78px;height:78px;object-fit:cover;border-radius:12px;cursor:pointer;border:1px solid var(--line);flex-shrink:0}
+.thumbs img.on{border-color:var(--ac);box-shadow:0 0 0 2px rgba(201,162,76,.35)}
 .vid{position:relative;aspect-ratio:16/9;border-radius:var(--r);overflow:hidden;background:#000;margin-top:12px}.vid iframe,.vid video{position:absolute;inset:0;width:100%;height:100%;border:0}
 .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#ff4d6d;margin-right:8px;animation:pulse 1.4s infinite}@keyframes pulse{50%{opacity:.25}}
 .info{padding:26px}.info h1{font-size:44px}.tags{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
@@ -59,6 +61,11 @@ dl{display:grid;grid-template-columns:110px 1fr;gap:6px 14px;margin:14px 0}dt{co
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.tabs button{border:1px solid var(--line);background:transparent;color:var(--mu);padding:8px 18px;border-radius:99px;cursor:pointer;font:inherit}.tabs .on{background:linear-gradient(135deg,#e8c875,var(--ac));color:#1a1510;border-color:transparent;font-weight:600}
 .row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 18px;margin-top:10px}
 .modal{position:fixed;inset:0;z-index:20;background:rgba(8,12,10,.72);display:grid;place-items:center;padding:16px;overflow:auto}.modal>div{width:min(720px,100%);max-height:92vh;overflow:auto;background:#141c18}
+.modal.wide>div{width:min(980px,100%)}.av-head{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:18px}
+.av-head h3{margin:0;font-family:var(--serif);font-size:28px}.av-sec{margin-top:22px}.av-sec h4{margin:0 0 10px;font-size:15px;color:var(--ac);letter-spacing:.04em;text-transform:uppercase}
+.av-dl{display:grid;grid-template-columns:140px 1fr;gap:8px 16px;margin:0}.av-dl dt{color:var(--mu)}.av-dl dd{margin:0;word-break:break-word}
+.av-ph{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}.av-ph img{width:88px;height:88px;object-fit:contain;background:rgba(0,0,0,.2);border-radius:12px;border:1px solid var(--line)}
+.row span:last-child{flex-shrink:0}
 .fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:600px){.fg{grid-template-columns:1fr}}.fg label{display:grid;gap:4px;color:var(--mu);font-size:13px;text-transform:capitalize}
 .act{display:flex;gap:10px;margin-top:18px}.pth{display:inline-block;position:relative;margin:8px 8px 0 0}.pth img{width:70px;height:70px;object-fit:cover;border-radius:10px}.pth b{position:absolute;top:-6px;right:-6px;background:#ff4d6d;border-radius:50%;width:20px;height:20px;text-align:center;line-height:20px;cursor:pointer;font-size:13px}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2420;border:1px solid var(--ac);padding:10px 20px;border-radius:99px;z-index:30;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.25)}#toast.on{opacity:1}
@@ -93,15 +100,19 @@ function embed(u){const y=u.match(/(?:youtu\.be\/|v=|\/live\/|\/embed\/|\/shorts
  if(y)return `<iframe src="https://www.youtube.com/embed/${y[1]}" allow="autoplay;encrypted-media;picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
  if(/\.(mp4|webm)(\?|$)/i.test(u))return `<video src="${E(u)}" controls muted loop playsinline></video>`;
  return `<a class="btn" target="_blank" rel="noopener" href="${E(u)}">Watch video ↗</a>`}
+function fitMainPhoto(img){if(!img?.naturalWidth)return;img.removeAttribute('width');img.removeAttribute('height')}
+function pickPhoto(src,el){const mi=$('#mi');if(!mi)return;mi.src=src;const go=()=>{fitMainPhoto(mi);document.querySelectorAll('.thumbs img').forEach(t=>t.classList.toggle('on',t===el));};mi.onload=go;if(mi.complete)go()}
 let BIRDS=null,PH={},PHS={};
 async function ensureBirds(){if(BIRDS)return;if(DEMO){BIRDS=DB;return}
  const [b,p]=await Promise.all([sb.from('public_birds').select('*').order('name'),sb.from('bird_photos').select('*').order('sort_order')]);
  BIRDS=b.data||[];PHS={};PH={};(p.data||[]).sort((x,y)=>y.is_primary-x.is_primary).forEach(r=>(PHS[r.bird_id]=PHS[r.bird_id]||[]).push(pu(r.path)));for(const k in PHS)PH[k]=PHS[k][0]}
 /* ───────── lineage diagram: one pair + only its chicks ───────── */
 function pairLabel(blk){const x=blk.lines_cross||{},fl=x.father_line||blk.father?.line_name||'',ml=x.mother_line||blk.mother?.line_name||'';return fl&&ml?fl+' × '+ml:fl||ml||'Pairing'}
-function pairSVG(blk,self,past){const W=760,cw=150,ch=46,g=14,cx=W/2;let y=118,o='';
- const node=(c,x,y)=>{const col=c.sex=='male'?'var(--m)':c.sex=='female'?'var(--f)':'#888',p=PH[c.id],tx=p?46:12,ln=nm(c.line_name||'—');
-  return `<g class="nd${c.id==self?' me':''}" onclick="location.hash='#/bird/${c.id}'" transform="translate(${x},${y})"><rect width="${cw}" height="${ch}" rx="14" style="stroke:${col}"/>${p?`<image href="${p}" x="6" y="6" width="34" height="34" preserveAspectRatio="xMidYMid slice" style="clip-path:circle(50%)"/>`:''}<text x="${tx}" y="20">${nm(c.name)}</text><text x="${tx}" y="36" class="s">${ln}</text></g>`};
+function adminBird(c){if(!c?.id||!A.birds?.length)return c;const x=A.birds.find(b=>b.id==c.id);return x?{...c,...x}:c}
+function adminBlk(blk){if(!blk)return blk;return{...blk,father:adminBird(blk.father),mother:adminBird(blk.mother),chicks:(blk.chicks||[]).map(adminBird)}}
+function pairSVG(blk,self,past,adm){const W=760,cw=150,ch=46,g=14,cx=W/2;let y=118,o='';
+ const node=(c,x,y)=>{const b=adm?adminBird(c):c,col=b.sex=='male'?'var(--m)':b.sex=='female'?'var(--f)':'#888',p=PH[b.id],tx=p?46:12,sub=adm?nm(b.ring_number||'no ring'):nm(b.line_name||'—');
+  return `<g class="nd${b.id==self?' me':''}" onclick="location.hash='#/bird/${b.id}'" transform="translate(${x},${y})"><rect width="${cw}" height="${ch}" rx="14" style="stroke:${col}"/>${p?`<image href="${p}" x="6" y="6" width="34" height="34" preserveAspectRatio="xMidYMid slice" style="clip-path:circle(50%)"/>`:''}<text x="${tx}" y="20">${nm(b.name)}</text><text x="${tx}" y="36" class="s">${sub}</text></g>`};
  const pl=E(String(pairLabel(blk)||'').slice(0,28));o+=`<path class="ln ${past?'past':''}" d="M${cx-40} 43H${cx+40}"/><rect class="pill" x="${cx-72}" y="28" width="144" height="30" rx="15"/><text x="${cx}" y="48" class="pt">${pl}</text>`;
  o+=node(blk.father,cx-cw-40,20)+node(blk.mother,cx+40,20);
  const gr={};(blk.chicks||[]).forEach(c=>(gr[c.clutch||'Chicks']=gr[c.clutch||'Chicks']||[]).push(c));
@@ -119,7 +130,7 @@ addEventListener('hashchange',route);
 async function home(){
  app.innerHTML=`<section class="hero"><p class="kick">Ethical breeding · family raised</p><h1>${E(C.NAME)}<span>${E(C.HERO_ACCENT||'')}</span></h1><p class="sub">${E(C.TAGLINE)}</p><div class="hero-actions"><a class="btn" onclick="$('#list').scrollIntoView({behavior:'smooth'})">Browse our birds</a><a class="btn ghost" onclick="$('#list').scrollIntoView({behavior:'smooth'})">View lineage &amp; photos</a></div><ul class="trust"><li>Full pedigree records</li><li>Photos &amp; video on profiles</li><li>Transparent breeding history</li></ul></section>
  ${C.LIVE_URL?`<section class="wrap"><h2><span class="dot"></span>Live aviary cam</h2><p class="section-lead">See our birds in real time before you visit or reserve.</p><div class="vid">${embed(C.LIVE_URL)}</div></section>`:''}
- <section class="wrap" id="list"><h2>Available &amp; showcase birds</h2><p class="section-lead">Each profile includes mutation details, ring ID, lineage diagrams, and media — everything you need before making an enquiry.</p><div class="bar"><input id="q" placeholder="Search by name, species, colour, line…"><select id="sx"><option value="">All birds</option><option>male</option><option>female</option><option>unknown</option></select></div><div class="grid" id="grid"></div></section>`;
+ <section class="wrap" id="list"><h2>Available &amp; showcase birds</h2><p class="section-lead">Each profile includes mutation details, breeding line, lineage diagrams, and media — everything you need before making an enquiry.</p><div class="bar"><input id="q" placeholder="Search by name, species, colour, line…"><select id="sx"><option value="">All birds</option><option>male</option><option>female</option><option>unknown</option></select></div><div class="grid" id="grid"></div></section>`;
  await ensureBirds();draw();$('#q').oninput=$('#sx').onchange=draw;
  const g=$('#grid');g.onmousemove=e=>{const c=e.target.closest('.card');if(!c)return;const r=c.getBoundingClientRect();c.style.setProperty('--ry',((e.clientX-r.left)/r.width-.5)*10+'deg');c.style.setProperty('--rx',(.5-(e.clientY-r.top)/r.height)*10+'deg')};
  g.onmouseout=e=>{const c=e.target.closest('.card');c&&(c.style.removeProperty('--rx'),c.style.removeProperty('--ry'))}}
@@ -132,7 +143,7 @@ async function bird(id){app.innerHTML='<div class="wrap mu">Loading…</div>';aw
  const b=p.bird,ph=PHS[id]||[],r=(k,v)=>v?`<dt>${k}</dt><dd>${E(v)}</dd>`:'';
  app.innerHTML=`<div class="wrap"><a class="mu" href="#/">← Back to all birds</a><div class="two" style="margin-top:14px"><div>
  <div class="main">${ph[0]?`<img id="mi" src="${ph[0]}" alt="${E(b.name)}">`:'<span class="big">🦜</span>'}</div>
- ${ph.length>1?`<div class="thumbs">${ph.map(u=>`<img src="${u}" onclick="$('#mi').src=this.src" alt="">`).join('')}</div>`:''}
+ ${ph.length>1?`<div class="thumbs">${ph.map((u,i)=>`<img src="${u}" class="${i?'':'on'}" onclick="pickPhoto(this.src,this)" alt="">`).join('')}</div>`:''}
  ${b.video_url?`<div class="vid">${embed(b.video_url)}</div>`:''}</div>
  <div class="info glass"><h1>${E(b.name)}</h1><div class="tags"><span class="tag ${b.sex}">${b.sex}</span>${b.status?`<span class="tag">${E(b.status)}</span>`:''}</div>
  <dl>${r('Species',b.species)}${r('Line',b.line_name)}${r('Phenotype',b.phenotype)}${r('Genotype',b.genotype)}${r('Hatched',b.hatch_date)}${r('Bred by',b.bred_by)}</dl>
@@ -141,7 +152,8 @@ async function bird(id){app.innerHTML='<div class="wrap mu">Loading…</div>';aw
  ${p.history?.length?`<h3>Breeders before</h3><div class="tl">${p.history.map(h=>`<div><b>${E(h.name)}</b> <small>${E(h.role)}${h.from_year?' · '+h.from_year:''}${h.to_year?'–'+h.to_year:''}</small>${h.notes?`<br><small>${E(h.notes)}</small>`:''}</div>`).join('')}</div>`:''}</div></div>
  ${p.origin?`<h2>Origin<small>parents, lines &amp; siblings</small></h2><div class="glass dg">${pairSVG(p.origin,id)}</div>`:''}
  ${p.current_pairing?`<h2>Current pairing<small>${E(pairLabel(p.current_pairing))} — lines united</small></h2><div class="glass dg">${pairSVG(p.current_pairing,id)}</div>`:''}
- ${(p.past_pairings||[]).map(x=>`<h2>Previous pairing<small>${E(pairLabel(x))}</small></h2><div class="glass dg">${pairSVG(x,id,1)}</div>`).join('')}</div>`}
+ ${(p.past_pairings||[]).map(x=>`<h2>Previous pairing<small>${E(pairLabel(x))}</small></h2><div class="glass dg">${pairSVG(x,id,1)}</div>`).join('')}</div>`;
+ const mi=$('#mi');if(mi){const go=()=>fitMainPhoto(mi);mi.onload=go;if(mi.complete)go()}}
 /* ───────── admin ───────── */
 let TAB='birds';const A={};
 const bn=id=>(A.birds.find(x=>x.id==id)||{}).name||'?';
@@ -162,7 +174,25 @@ async function login(){let u=$('#em').value.trim();if(!u.includes('@'))u=u+'@msk
 function adminView(){
  app.innerHTML=`<div class="wrap"><div class="bar"><h2 style="margin:0">Admin</h2><span><button class="btn s" onclick="exportAll()">Export CSV</button> <button class="btn s" onclick="sb.auth.signOut().then(route)">Sign out</button></span></div>
  <div class="tabs">${Object.keys(T).map(k=>`<button class="${k==TAB?'on':''}" onclick="TAB='${k}';adminView()">${T[k].n}</button>`).join('')}</div>
- <button class="btn" onclick="edit()">+ Add</button>${A[TAB].map(r=>{const k=r[T[TAB].pk||'id'];return `<div class="row glass"><span>${E(T[TAB].t(r))}</span><span><button class="btn s" onclick="edit('${k}')">Edit</button> <button class="btn s d" onclick="del('${k}')">Delete</button></span></div>`}).join('')}</div>`}
+ <button class="btn" onclick="edit()">+ Add</button>${A[TAB].map(r=>{const k=r[T[TAB].pk||'id'];const vb=TAB=='birds'?`<button class="btn s" onclick="viewBird('${k}')">View as admin</button> `:'';return `<div class="row glass"><span>${E(T[TAB].t(r))}</span><span>${vb}<button class="btn s" onclick="edit('${k}')">Edit</button> <button class="btn s d" onclick="del('${k}')">Delete</button></span></div>`}).join('')}</div>`}
+function avRow(k,v){return v!=null&&v!==''?`<dt>${k}</dt><dd>${E(String(v))}</dd>`:''}
+function avRef(id){const x=A.birds.find(b=>b.id==id);return x?L.birds(x):''}
+function avMoney(n){return n==null||n===''?'':Number(n).toLocaleString()}
+function cacheAdminPhotos(){PHS={};PH={};A.bird_photos.sort((a,b)=>a.sort_order-b.sort_order).forEach(r=>{const u=pu(r.path);(PHS[r.bird_id]=PHS[r.bird_id]||[]).push(u);if(r.is_primary||!PH[r.bird_id])PH[r.bird_id]=u})}
+async function viewBird(id){
+ const b=A.birds.find(x=>x.id==id);if(!b)return toast('Bird not found');
+ const priv=A.bird_private.find(x=>x.bird_id==id),hist=A.bird_history.filter(x=>x.bird_id==id).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)),photos=A.bird_photos.filter(x=>x.bird_id==id).sort((a,b)=>a.sort_order-b.sort_order);
+ cacheAdminPhotos();
+ const {data:profile}=await sb.rpc('public_bird_profile',{p_bird:id});
+ let lin='';if(profile){if(profile.origin)lin+=`<div class="av-sec"><h4>Origin · ring numbers shown</h4><div class="dg glass">${pairSVG(adminBlk(profile.origin),id,0,1)}</div></div>`;if(profile.current_pairing)lin+=`<div class="av-sec"><h4>Current pairing · ${E(pairLabel(profile.current_pairing))}</h4><div class="dg glass">${pairSVG(adminBlk(profile.current_pairing),id,0,1)}</div></div>`;(profile.past_pairings||[]).forEach(x=>{lin+=`<div class="av-sec"><h4>Previous pairing · ${E(pairLabel(x))}</h4><div class="dg glass">${pairSVG(adminBlk(x),id,1,1)}</div></div>`})}
+ const m=document.createElement('div');m.className='modal wide';m.id='m';m.innerHTML=`<div class="glass pad"><div class="av-head"><div><h3>${E(b.name)}</h3><div class="tags"><span class="tag ${b.sex}">${b.sex}</span>${b.status?`<span class="tag">${E(b.status)}</span>`:''}<span class="tag">Admin view</span></div></div><div class="act" style="margin:0"><button class="btn s" onclick="location.hash='#/bird/${id}'">Public page</button><button class="btn s" onclick="$('#m').remove();edit('${id}')">Edit</button><button class="btn s" onclick="$('#m').remove()">Close</button></div></div>
+ ${photos.length?`<div class="av-sec"><h4>Photos</h4><div class="av-ph">${photos.map(p=>`<img src="${pu(p.path)}" alt="">`).join('')}</div></div>`:''}
+ ${b.video_url?`<div class="av-sec"><h4>Video</h4><div class="vid">${embed(b.video_url)}</div></div>`:''}
+ <div class="av-sec"><h4>Bird record</h4><dl class="av-dl">${avRow('Ring',b.ring_number)}${avRow('Species',b.species)}${avRow('Line',b.line_name)}${avRow('Phenotype',b.phenotype)}${avRow('Genotype',b.genotype)}${avRow('Hatched',b.hatch_date)}${avRow('Status',b.status)}${avRow('Bred by',b.bred_by)}${avRow('Father',avRef(b.father_id))}${avRow('Mother',avRef(b.mother_id))}${avRow('Clutch',(()=>{const c=A.clutches.find(x=>x.id==b.clutch_id);return c?L.clutches(c):''})())}${avRow('Video',b.video_url)}${avRow('Origin story',b.origin_description)}${avRow('Parents note',b.parents_note)}${avRow('Notes',b.notes)}${avRow('Created',b.created_at?.slice?.(0,10)||b.created_at)}${avRow('Updated',b.updated_at?.slice?.(0,10)||b.updated_at)}</dl></div>
+ ${priv?`<div class="av-sec"><h4>Private · sales &amp; contacts</h4><dl class="av-dl">${avRow('Bought from',priv.bought_from_name)}${avRow('Seller phone',priv.bought_from_phone)}${avRow('Bought on',priv.bought_on)}${avRow('Bought price',avMoney(priv.bought_price))}${avRow('Sold to',priv.sold_to_name)}${avRow('Buyer phone',priv.sold_to_phone)}${avRow('Sold on',priv.sold_on)}${avRow('Sold price',avMoney(priv.sold_price))}${avRow('Asking price',avMoney(priv.asking_price))}${avRow('Notes',priv.notes)}</dl></div>`:'<div class="av-sec"><h4>Private</h4><p class="mu">No private record yet.</p></div>'}
+ ${hist.length?`<div class="av-sec"><h4>History (${hist.length})</h4><div class="tl">${hist.map(h=>`<div><b>${E(h.person_name)}</b> <small>${E(h.role)}${h.from_year?' · '+h.from_year:''}${h.to_year?'–'+h.to_year:''}${h.show_publicly?' · public':' · hidden'}</small>${h.notes?`<br><small>${E(h.notes)}</small>`:''}</div>`).join('')}</div></div>`:'<div class="av-sec"><h4>History</h4><p class="mu">No history entries.</p></div>'}
+ ${profile?.lines_carried?.length?`<div class="av-sec"><h4>Lines carried</h4><div class="chips">${profile.lines_carried.map(l=>`<span>${E(l)}</span>`).join('')}</div></div>`:''}
+ ${lin}<div class="act"><button class="btn s" onclick="$('#m').remove();edit('${id}')">Edit bird</button><button class="btn s" onclick="$('#m').remove()">Close</button></div></div>`;document.body.append(m)}
 function edit(key){const c=T[TAB],pk=c.pk||'id',r=key?A[TAB].find(x=>x[pk]==key):{};
  const fld=([n,ty])=>{const v=r[n]??'';let i;
   if(ty=='area')i=`<textarea name="${n}">${E(v)}</textarea>`;
