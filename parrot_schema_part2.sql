@@ -142,14 +142,7 @@ begin
     return null;
   end if;
 
-  desc_text := trim(both from concat_ws(
-    '. ',
-    case when b.bred_by is not null and b.bred_by <> '' then 'Bred by ' || b.bred_by else null end,
-    nullif(b.origin_description, '')
-  ));
-  if desc_text = '' then
-    desc_text := null;
-  end if;
+  desc_text := nullif(trim(both from coalesce(b.origin_description, '')), '');
 
   select coalesce(jsonb_agg(
     jsonb_build_object(

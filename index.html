@@ -94,7 +94,7 @@ const DB=[{id:'1',name:'Sol',sex:'male',species:'Cockatiel',ring_number:'AB 1234
 {id:'4',name:'Dawn',sex:'female',species:'Cockatiel',ring_number:'CD 78',phenotype:'Lutino',genotype:'Lutino (visual)',line_name:'Sunrise line',f:'1',m:'2',c:'Clutch 1, 2026'},
 {id:'5',name:'Pip',sex:'unknown',species:'Cockatiel',ring_number:'no ring',phenotype:'Normal grey',genotype:'Normal, split Lutino',line_name:'Sunrise line',f:'1',m:'2',c:'Clutch 2, 2026'}];
 const blk=(a,b)=>{const f=DB.find(x=>x.id==a),m=DB.find(x=>x.id==b),fl=f?.line_name||'',ml=m?.line_name||'',comb=[fl,ml].filter((x,i,a)=>x&&a.indexOf(x)===i);return{father:f,mother:m,lines_cross:{father_line:fl,mother_line:ml,combined:comb},chicks:DB.filter(x=>x.f==a&&x.m==b).map(x=>({...x,clutch:x.c}))}};
-const demoProfile=id=>{const b=DB.find(x=>x.id==id);return b&&{bird:b,description:(b.bred_by?'Bred by '+b.bred_by+'. ':'')+(b.origin_description||''),lines_carried:[b.line_name].filter(Boolean),history:b.bred_by?[{name:b.bred_by,role:'breeder',from_year:2023}]:[],origin:b.f?blk(b.f,b.m):null,current_pairing:id=='1'||id=='2'?blk('1','2'):null,past_pairings:[]}};
+const demoProfile=id=>{const b=DB.find(x=>x.id==id);return b&&{bird:b,description:b.origin_description||null,lines_carried:[b.line_name].filter(Boolean),history:b.bred_by?[{name:b.bred_by,role:'breeder',from_year:2023}]:[],origin:b.f?blk(b.f,b.m):null,current_pairing:id=='1'||id=='2'?blk('1','2'):null,past_pairings:[]}};
 /* ───────── media ───────── */
 function embed(u){const y=u.match(/(?:youtu\.be\/|v=|\/live\/|\/embed\/|\/shorts\/)([\w-]{11})/);
  if(y)return `<iframe src="https://www.youtube.com/embed/${y[1]}" allow="autoplay;encrypted-media;picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
@@ -136,7 +136,7 @@ async function home(){
  g.onmouseout=e=>{const c=e.target.closest('.card');c&&(c.style.removeProperty('--rx'),c.style.removeProperty('--ry'))}}
 function draw(){const s=$('#q').value.toLowerCase(),x=$('#sx').value;
  $('#grid').innerHTML=BIRDS.filter(b=>(!x||b.sex==x)&&[b.name,b.species,b.phenotype,b.genotype,b.line_name].join(' ').toLowerCase().includes(s)).map((b,i)=>
- `<a class="card" style="--i:${i}" href="#/bird/${b.id}"><div class="ph">${PH[b.id]?`<img loading="lazy" src="${PH[b.id]}" alt="${E(b.name)}">`:'🦜'}<i class="${b.sex}"></i></div><div class="ci"><b>${E(b.name)}</b><small>${E(b.species||'Parrot')}${b.line_name?' · '+E(b.line_name):''}</small><span class="cta">View full profile →</span></div></a>`).join('')||'<p class="mu">No birds match your search — try clearing filters or check back soon for new arrivals.</p>'}
+ `<a class="card" style="--i:${i}" href="#/bird/${b.id}"><div class="ph">${PH[b.id]?`<img loading="lazy" src="${PH[b.id]}" alt="${E(b.name)}">`:'🦜'}<i class="${b.sex}"></i></div><div class="ci"><b>${E(b.name)}</b><small>${E(b.species||'Parrot')}${b.line_name?' · '+E(b.line_name):''}</small><em>${E(b.phenotype||'See profile')}</em><span class="cta">View full profile →</span></div></a>`).join('')||'<p class="mu">No birds match your search — try clearing filters or check back soon for new arrivals.</p>'}
 async function bird(id){app.innerHTML='<div class="wrap mu">Loading…</div>';await ensureBirds();
  const p=DEMO?demoProfile(id):(await sb.rpc('public_bird_profile',{p_bird:id})).data;
  if(!p){app.innerHTML='<div class="wrap"><a href="#/">← Back</a><p>Bird not found.</p></div>';return}
@@ -146,7 +146,7 @@ async function bird(id){app.innerHTML='<div class="wrap mu">Loading…</div>';aw
  ${ph.length>1?`<div class="thumbs">${ph.map((u,i)=>`<img src="${u}" class="${i?'':'on'}" onclick="pickPhoto(this.src,this)" alt="">`).join('')}</div>`:''}
  ${b.video_url?`<div class="vid">${embed(b.video_url)}</div>`:''}</div>
  <div class="info glass"><h1>${E(b.name)}</h1><div class="tags"><span class="tag ${b.sex}">${b.sex}</span>${b.status?`<span class="tag">${E(b.status)}</span>`:''}</div>
- <dl>${r('Species',b.species)}${r('Line',b.line_name)}${r('Colour',b.phenotype)}${r('Hatched',b.hatch_date)}${r('Bred by',b.bred_by)}</dl>
+ <dl>${r('Species',b.species)}${r('Line',b.line_name)}${r('Phenotype',b.phenotype)}${r('Genotype',b.genotype)}${r('Hatched',b.hatch_date)}${r('Bred by',b.bred_by)}</dl>
  ${p.description?`<p>${E(p.description)}</p>`:''}
  ${p.lines_carried?.length?`<h3>Lines carried</h3><div class="chips">${p.lines_carried.map(l=>`<span>${E(l)}</span>`).join('')}</div>`:''}
  ${p.history?.length?`<h3>Breeders before</h3><div class="tl">${p.history.map(h=>`<div><b>${E(h.name)}</b> <small>${E(h.role)}${h.from_year?' · '+h.from_year:''}${h.to_year?'–'+h.to_year:''}</small>${h.notes?`<br><small>${E(h.notes)}</small>`:''}</div>`).join('')}</div>`:''}</div></div>

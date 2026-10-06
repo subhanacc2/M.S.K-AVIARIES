@@ -12,7 +12,12 @@ if (!conn) {
   process.exit(1);
 }
 
-const files = ['parrot_schema.sql', 'parrot_schema_part2.sql', 'parrot_schema_part3_privacy.sql'];
+const files = [
+  'parrot_schema.sql',
+  'parrot_schema_part2.sql',
+  'parrot_schema_part3_privacy.sql',
+  'parrot_schema_part4_description.sql',
+];
 
 const client = new pg.Client({ connectionString: conn, ssl: { rejectUnauthorized: false } });
 
