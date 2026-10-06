@@ -13,7 +13,6 @@ select
   sex,
   hatch_date,
   phenotype,
-  genotype,
   status,
   origin_description,
   bred_by,
@@ -34,7 +33,7 @@ as $$
   from (
     select
       id, name, species, sex, hatch_date,
-      phenotype, genotype, status, origin_description,
+      phenotype, status, origin_description,
       bred_by, line_name, video_url
     from birds where id = p_id
   ) b;
