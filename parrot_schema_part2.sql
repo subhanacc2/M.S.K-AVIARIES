@@ -11,7 +11,6 @@ select
   name,
   species,
   sex,
-  ring_number,
   hatch_date,
   phenotype,
   genotype,
@@ -40,7 +39,7 @@ as $$
   select to_jsonb(b)
   from (
     select
-      id, name, species, sex, ring_number, hatch_date,
+      id, name, species, sex, hatch_date,
       phenotype, genotype, status, origin_description,
       bred_by, line_name, video_url
     from birds where id = p_id
@@ -88,6 +87,22 @@ as $$
   select jsonb_build_object(
     'father', bird_public_json(p_male),
     'mother', bird_public_json(p_female),
+    'lines_cross', (
+      select jsonb_build_object(
+        'father_line', fm.line_name,
+        'mother_line', ff.line_name,
+        'combined', coalesce((
+          select jsonb_agg(distinct ln order by ln)
+          from (
+            select nullif(btrim(x.ln), '') as ln
+            from (values (fm.line_name), (ff.line_name)) as x(ln)
+            where x.ln is not null and btrim(x.ln) <> ''
+          ) q
+        ), '[]'::jsonb)
+      )
+      from birds fm, birds ff
+      where fm.id = p_male and ff.id = p_female
+    ),
     'chicks', coalesce((
       select jsonb_agg(
         bird_public_json(b.id) || jsonb_build_object(

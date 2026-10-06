@@ -15,7 +15,7 @@ Supabase free plan (database, login, photo storage) plus Cloudflare Pages or Ver
 
 ## Setup (about 15 minutes)
 1. Create a free project at supabase.com.
-2. SQL Editor: run `parrot_schema.sql`, then `parrot_schema_part2.sql`, then this small addition for video links:
+2. SQL Editor: run `parrot_schema.sql`, then `parrot_schema_part2.sql`, then `parrot_schema_part3_privacy.sql` (hides ring numbers from the public site). Or run `npm run db:apply` with `DATABASE_URL` set. Optional legacy step if you skipped part 1 video column:
    ```sql
    alter table birds add column video_url text;
    create or replace view public_birds as
@@ -51,7 +51,8 @@ With the URL left empty the site runs in **demo mode** with sample cockatiels, s
 - Lines carried are inherited from ancestors (up to 4 generations) unless you type one.
 
 ## Privacy model
-- Public visitors cannot read the raw tables. They only receive what `public_bird_profile` returns: the bird, its own origin pair and siblings, its current pair and chicks, and past pairings you tick "show after end" on.
+- Public visitors cannot read the raw tables. They only receive what `public_bird_profile` returns: the bird (without ring number), line names, its own origin pair and siblings, its current pair and chicks (with **lines crossed** on each pairing), and past pairings you tick "show after end" on.
+- **Ring numbers** are admin-only (full `birds` table when logged in). Public listings and lineage diagrams show **line names** instead.
 - Prices, buyer/seller names and phone numbers live in `bird_private`, readable only when logged in.
 - A chick's own page always shows its two parents, so a past pairing is visible on that pair's chicks.
 
