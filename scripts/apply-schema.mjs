@@ -18,6 +18,7 @@ const files = [
   'parrot_schema_part3_privacy.sql',
   'parrot_schema_part4_description.sql',
   'parrot_schema_part5_hide_genotype.sql',
+  'parrot_schema_part6_hide_phenotype.sql',
 ];
 
 const client = new pg.Client({ connectionString: conn, ssl: { rejectUnauthorized: false } });

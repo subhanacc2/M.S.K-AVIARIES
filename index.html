@@ -135,8 +135,8 @@ async function home(){
  const g=$('#grid');g.onmousemove=e=>{const c=e.target.closest('.card');if(!c)return;const r=c.getBoundingClientRect();c.style.setProperty('--ry',((e.clientX-r.left)/r.width-.5)*10+'deg');c.style.setProperty('--rx',(.5-(e.clientY-r.top)/r.height)*10+'deg')};
  g.onmouseout=e=>{const c=e.target.closest('.card');c&&(c.style.removeProperty('--rx'),c.style.removeProperty('--ry'))}}
 function draw(){const s=$('#q').value.toLowerCase(),x=$('#sx').value;
- $('#grid').innerHTML=BIRDS.filter(b=>(!x||b.sex==x)&&[b.name,b.species,b.phenotype,b.line_name].join(' ').toLowerCase().includes(s)).map((b,i)=>
- `<a class="card" style="--i:${i}" href="#/bird/${b.id}"><div class="ph">${PH[b.id]?`<img loading="lazy" src="${PH[b.id]}" alt="${E(b.name)}">`:'🦜'}<i class="${b.sex}"></i></div><div class="ci"><b>${E(b.name)}</b><small>${E(b.species||'Parrot')}${b.line_name?' · '+E(b.line_name):''}</small><em>${E(b.phenotype||'See profile')}</em><span class="cta">View full profile →</span></div></a>`).join('')||'<p class="mu">No birds match your search — try clearing filters or check back soon for new arrivals.</p>'}
+ $('#grid').innerHTML=BIRDS.filter(b=>(!x||b.sex==x)&&[b.name,b.species,b.line_name,b.status,b.origin_description].join(' ').toLowerCase().includes(s)).map((b,i)=>
+ `<a class="card" style="--i:${i}" href="#/bird/${b.id}"><div class="ph">${PH[b.id]?`<img loading="lazy" src="${PH[b.id]}" alt="${E(b.name)}">`:'🦜'}<i class="${b.sex}"></i></div><div class="ci"><b>${E(b.name)}</b><small>${E(b.species||'Parrot')}${b.line_name?' · '+E(b.line_name):''}</small>${b.status?`<em>${E(b.status)}</em>`:''}<span class="cta">View full profile →</span></div></a>`).join('')||'<p class="mu">No birds match your search — try clearing filters or check back soon for new arrivals.</p>'}
 async function bird(id){app.innerHTML='<div class="wrap mu">Loading…</div>';await ensureBirds();
  const p=DEMO?demoProfile(id):(await sb.rpc('public_bird_profile',{p_bird:id})).data;
  if(!p){app.innerHTML='<div class="wrap"><a href="#/">← Back</a><p>Bird not found.</p></div>';return}
@@ -146,7 +146,7 @@ async function bird(id){app.innerHTML='<div class="wrap mu">Loading…</div>';aw
  ${ph.length>1?`<div class="thumbs">${ph.map((u,i)=>`<img src="${u}" class="${i?'':'on'}" onclick="pickPhoto(this.src,this)" alt="">`).join('')}</div>`:''}
  ${b.video_url?`<div class="vid">${embed(b.video_url)}</div>`:''}</div>
  <div class="info glass"><h1>${E(b.name)}</h1><div class="tags"><span class="tag ${b.sex}">${b.sex}</span>${b.status?`<span class="tag">${E(b.status)}</span>`:''}</div>
- <dl>${r('Species',b.species)}${r('Line',b.line_name)}${r('Colour / type',b.phenotype)}${r('Hatched',b.hatch_date)}${r('Bred by',b.bred_by)}</dl>
+ <dl>${r('Species',b.species)}${r('Line',b.line_name)}${r('Hatched',b.hatch_date)}${r('Bred by',b.bred_by)}</dl>
  ${p.description?`<p>${E(p.description)}</p>`:''}
  ${p.lines_carried?.length?`<h3>Lines carried</h3><div class="chips">${p.lines_carried.map(l=>`<span>${E(l)}</span>`).join('')}</div>`:''}
  ${p.history?.length?`<h3>Breeders before</h3><div class="tl">${p.history.map(h=>`<div><b>${E(h.name)}</b> <small>${E(h.role)}${h.from_year?' · '+h.from_year:''}${h.to_year?'–'+h.to_year:''}</small>${h.notes?`<br><small>${E(h.notes)}</small>`:''}</div>`).join('')}</div>`:''}</div></div>
